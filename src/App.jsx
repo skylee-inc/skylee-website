@@ -66,10 +66,23 @@ const services = [
   { title: "Cybersecurity", text: "Risk-aware security programs that protect systems, data, identities, and business continuity.", icon: Lock },
 ];
 
+
+function SectionHeader({ eyebrow, title, text }) {
+  return (
+    <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport} className="mx-auto max-w-3xl text-center">
+      {eyebrow && <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-[#2F80ED]">{eyebrow}</p>}
+      <h2 className="text-3xl font-semibold tracking-tight text-[#0F2747] md:text-5xl">{title}</h2>
+      {text && <p className="mt-5 text-base leading-7 text-slate-600 md:text-lg">{text}</p>}
+    </motion.div>
+  );
+}
 function Logo() {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <motion.div
       whileHover="hover"
+      onClick={() => setExpanded(!expanded)}
       className="group flex cursor-pointer items-center gap-3"
     >
       <img
@@ -80,6 +93,11 @@ function Logo() {
 
       <motion.div
         initial={{ width: 0, opacity: 0, x: -8 }}
+        animate={
+          expanded
+            ? { width: "auto", opacity: 1, x: 0 }
+            : { width: 0, opacity: 0, x: -8 }
+        }
         variants={{
           hover: {
             width: "auto",
@@ -94,15 +112,6 @@ function Logo() {
           Skylee Inc
         </p>
       </motion.div>
-    </motion.div>
-  );
-}
-function SectionHeader({ eyebrow, title, text }) {
-  return (
-    <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={viewport} className="mx-auto max-w-3xl text-center">
-      {eyebrow && <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-[#2F80ED]">{eyebrow}</p>}
-      <h2 className="text-3xl font-semibold tracking-tight text-[#0F2747] md:text-5xl">{title}</h2>
-      {text && <p className="mt-5 text-base leading-7 text-slate-600 md:text-lg">{text}</p>}
     </motion.div>
   );
 }
