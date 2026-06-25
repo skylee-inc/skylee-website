@@ -4,22 +4,13 @@ import json
 SYMBOL = "QQQ"
 
 
-def get_ai_decision(symbol):
-    data = yf.download(
-        symbol,
-        period="60d",
-        interval="1h"
-    )
+def get_daily_decision(symbol):
+    data = yf.download(symbol, period="1y")
 
     data["SMA20"] = data["Close"].rolling(20).mean()
     data["SMA50"] = data["Close"].rolling(50).mean()
 
-    # RSI calculation
     delta = data["Close"].diff()
-
-    # RSI calculation
-    delta = data["Close"].diff()
-
     gain = delta.where(delta > 0, 0)
     loss = -delta.where(delta < 0, 0)
 
@@ -30,7 +21,6 @@ def get_ai_decision(symbol):
     data["RSI"] = 100 - (100 / (1 + rs))
 
     data = data.dropna()
-
     latest = data.iloc[-1]
 
     price = float(latest["Close"].iloc[0])
@@ -38,46 +28,30 @@ def get_ai_decision(symbol):
     sma50 = float(latest["SMA50"].iloc[0])
     rsi = float(latest["RSI"].iloc[0])
 
-    difference = abs(sma20 - sma50)
-    confidence = min(95, round((difference / sma50) * 1000, 2))
-
     if sma20 > sma50 and rsi < 70:
         signal = "BUY"
-        reason = (
-            f"SMA20 ({sma20:.2f}) is above SMA50 ({sma50:.2f}) "
-            f"and RSI ({rsi:.2f}) is below overbought level."
-        )
-
+        reason = "Daily trend is bullish and RSI is not overbought."
     elif sma20 < sma50 and rsi > 30:
         signal = "SELL"
-        reason = (
-            f"SMA20 ({sma20:.2f}) is below SMA50 ({sma50:.2f}) "
-            f"and RSI ({rsi:.2f}) is above oversold level."
-        )
-
+        reason = "Daily trend is bearish and RSI is not oversold."
     else:
         signal = "HOLD"
-        reason = (
-            f"Conditions are not strong enough for BUY or SELL. "
-            f"SMA20: {sma20:.2f}, SMA50: {sma50:.2f}, RSI: {rsi:.2f}."
-        )
+        reason = "Daily signal is mixed."
 
-    decision = {
+    return {
         "symbol": symbol,
+        "timeframe": "daily",
         "price": round(price, 2),
         "sma20": round(sma20, 2),
         "sma50": round(sma50, 2),
         "rsi": round(rsi, 2),
         "signal": signal,
-        "confidence": confidence,
         "reason": reason
     }
 
-    return decision
-
 
 if __name__ == "__main__":
-    decision = get_ai_decision(SYMBOL)
-
-    print("===== AI STOCK AGENT DECISION =====")
+    decision = get_daily_decision(SYMBOL)
+    print("===== DAILY TREND AGENT =====")
     print(json.dumps(decision, indent=4))
+    

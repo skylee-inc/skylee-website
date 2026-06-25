@@ -6,6 +6,7 @@ SYMBOL = "QQQ"
 decision = get_ai_decision(SYMBOL)
 risk = check_risk(SYMBOL)
 
+
 print("===== AI STOCK AGENT REPORT =====")
 print(f"Symbol: {decision['symbol']}")
 print(f"Price: ${decision['price']}")
