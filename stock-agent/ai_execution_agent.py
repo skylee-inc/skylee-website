@@ -1,5 +1,4 @@
-from ai_agent import get_ai_decision
-from risk_manager import check_risk
+from decision_agent import get_final_decision
 
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
@@ -12,21 +11,19 @@ QTY = 1
 
 client = TradingClient(API_KEY, SECRET_KEY, paper=True)
 
-decision = get_ai_decision(SYMBOL)
-risk = check_risk(SYMBOL)
+decision = get_final_decision(SYMBOL)
+
+final_decision = decision["final_decision"]
 
 print("===== AI EXECUTION AGENT =====")
+print(f"Symbol: {decision['symbol']}")
+print(f"Daily Signal: {decision['daily_signal']}")
+print(f"Hourly Signal: {decision['hourly_signal']}")
+print(f"Risk Status: {decision['risk_status']}")
+print(f"Final Decision: {final_decision}")
+print(f"Reason: {decision['reason']}")
 
-print(f"Signal: {decision['signal']}")
-print(f"Confidence: {decision['confidence']}%")
-print(f"Risk Status: {risk['risk_status']}")
-
-if risk["risk_status"] != "SAFE":
-    print("Trading blocked by Risk Manager.")
-    exit()
-
-if decision["signal"] == "BUY":
-
+if final_decision == "BUY":
     order = MarketOrderRequest(
         symbol=SYMBOL,
         qty=QTY,
@@ -39,8 +36,7 @@ if decision["signal"] == "BUY":
     print("BUY order submitted")
     print("Order ID:", submitted_order.id)
 
-elif decision["signal"] == "SELL":
-
+elif final_decision == "SELL":
     order = MarketOrderRequest(
         symbol=SYMBOL,
         qty=QTY,
@@ -54,6 +50,6 @@ elif decision["signal"] == "SELL":
     print("Order ID:", submitted_order.id)
 
 else:
-    print("No trade executed.")
+    print("No trade executed. Final decision is HOLD.")
 
 print("==============================")
