@@ -1,4 +1,6 @@
 from decision_agent import get_final_decision
+from trade_logger import log_trade
+
 
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
@@ -51,5 +53,7 @@ elif final_decision == "SELL":
 
 else:
     print("No trade executed. Final decision is HOLD.")
+
+    log_trade(decision)
 
 print("==============================")
